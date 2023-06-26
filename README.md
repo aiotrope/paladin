@@ -1,2 +1,2 @@
 # paladin
-Nominated full stack web dev project.
+A capstone project.

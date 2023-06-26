@@ -1,0 +1,23 @@
+{
+  "name": "paladin",
+  "version": "1.0.0",
+  "description": "CT30A3204 course capstone project.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "install:frontend:": "cd frontend && npm install",
+    "transpile:backend": "cd backend && npm run transpile",
+    "build:frontend": "cd frontend && rm -rf build && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:fullstack": "npm run build:frontend && npm run build:backend",
+    "format:frontend": "cd frontend && npm run format",
+    "format:backend": "cd backend && npm run format",
+    "lint:frontend": "cd frontend && npm run linting -- --fix",
+    "lint:backend": "cd backend && npm run linting -- --fix",
+    "dev:backend": "NODE_ENV=development cd backend && npm run dev",
+    "dev:frontend": "NODE_ENV=development cd frontend && npm start",
+    "start": "NODE_ENV=production cd backend && npm run start"
+  },
+  "author": "Arnel Imperial",
+  "license": "BSD Zero Clause"
+}
