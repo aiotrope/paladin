@@ -1,39 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import createHttpError, { HttpError } from 'http-errors'
-import morgan, { StreamOptions } from 'morgan'
-import { AnyZodObject } from 'zod'
 
-import logger from './logger'
-
-const validateAuthObject = (schema: AnyZodObject) =>
-  async function (req: Request, res: Response, next: NextFunction) {
-    const resource = req.body
-
-    try {
-      await schema.parseAsync(resource)
-
-      return next()
-    } catch (err) {
-      logger.error(err)
-
-      res.status(400).json({ error: err })
-    }
-  }
-
-const stream: StreamOptions = {
-  write: (message) => logger.http(message),
-}
-
-const skip = () => {
-  const env = process.env.NODE_ENV || 'development'
-
-  return env !== 'development'
-}
-
-const loggingMiddleware = morgan(
-  ':method :url :status :res[content-length] - :response-time ms',
-  { stream, skip }
-)
+//import logger from '../utils/logger'
 
 const endPoint404 = (_req: Request, _res: Response, next: NextFunction) => {
   next(createHttpError(404))
@@ -117,11 +85,9 @@ const errorHandler = (
   }
   next(error)
 }
-const middlewares = {
-  validateAuthObject,
-  loggingMiddleware,
+const errorMiddleware = {
   endPoint404,
   errorHandler,
 }
 
-export default middlewares
+export default errorMiddleware

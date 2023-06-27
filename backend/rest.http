@@ -1,0 +1,9 @@
+### signup
+POST http://localhost:8080/api/user/signup
+Content-Type: application/json
+
+{
+   "email": "sample3@sr.io",
+   "password": "passP123//##",
+   "confirm": "passP123//##"
+}

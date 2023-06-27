@@ -12,6 +12,7 @@ const opts = {
 
 const dbConnection = () => {
   mongoose.set('strictQuery', false)
+
   if (process.env.NODE_ENV === 'development') {
     dbURL = config.mongo_url_dev
   }

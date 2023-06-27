@@ -6,11 +6,12 @@ import cors from 'cors'
 import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
 
-import middlewares from './utils/middlewares'
 import dbConnection from './utils/db'
+import loggingMiddleware from './middlewares/loggingMiddleware'
+import errorMiddleware from './middlewares/errorMiddleware'
 import logger from './utils/logger'
 
-import indexRouter from './routes'
+import userRouter from './routes/user'
 
 const app = express()
 
@@ -20,7 +21,7 @@ app.use(express.static('../frontend/build'))
 
 app.use(express.json())
 
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 
 app.use(cookieParser())
 
@@ -42,13 +43,13 @@ app.use(require('sanitize').middleware)
 
 app.use(mongoSanitize())
 
-app.use(middlewares.loggingMiddleware)
+app.use(loggingMiddleware.logging)
 
-app.use('/', indexRouter)
+app.use('/api/user', userRouter)
 
-app.use(middlewares.endPoint404)
+app.use(errorMiddleware.endPoint404)
 
-app.use(middlewares.errorHandler)
+app.use(errorMiddleware.errorHandler)
 
 app.listen(config.port, () => {
   logger.debug(`Server is running on port ${config.port}`)
