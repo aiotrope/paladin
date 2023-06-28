@@ -37,7 +37,7 @@ app.use(cookieParser())
 
 if (process.env.NODE_ENV === 'development') {
   let options = {
-    origin: 'http://localhost:3000',
+    origin: 'http://127.0.0.1:5173',
     optionsSuccessStatus: 200,
   }
   app.use(cors(options))
