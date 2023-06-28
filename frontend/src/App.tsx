@@ -1,8 +1,9 @@
 import { useState } from 'react'
+
+import getGoogleOAuthURL from './utils/getGoogleUrl'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import getGoogleOAuthURL from './utils/getGoogleUrl'
 
 function App() {
   const [count, setCount] = useState(0)
