@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
+require('express-async-errors')
 import createHttpError, { HttpError } from 'http-errors'
 
-//import logger from '../utils/logger'
+import logger from '../utils/logger'
 
 const endPoint404 = (_req: Request, _res: Response, next: NextFunction) => {
   next(createHttpError(404))
@@ -9,11 +10,11 @@ const endPoint404 = (_req: Request, _res: Response, next: NextFunction) => {
 
 const errorHandler = (
   error: HttpError,
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): object | void => {
-  //logger.warn(req.path)
+  logger.error(error.message)
   if (error.name === 'CastError') {
     return res.status(400).json({
       error: `${error.name}: ${error.message}`,
@@ -49,40 +50,18 @@ const errorHandler = (
     return res.status(401).json({ error: 'token expired!' })
   }
 
-  if (error.message === 'Problem fetching patients list!') {
-    return res.status(400).json({ error: error.message })
-  }
-
-  if (error.message === 'Problem fetching diagnoses list!') {
-    return res.status(400).json({ error: error.message })
-  }
-  if (error.message === '"name" is not allowed to be empty') {
-    return res.status(400).json({ error: error.message })
-  }
-  if (error.message === '"occupation" is not allowed to be empty') {
-    return res.status(400).json({ error: error.message })
-  }
-
-  if (error.message === '"ssn" is not allowed to be empty') {
-    return res.status(400).json({ error: error.message })
-  }
-
-  if (error.message === '"dateOfBirth" is not allowed to be empty') {
-    return res
-      .status(400)
-      .json({ error: 'Date of birth is not allowed to empty!' })
-  }
-
-  if (error.message === '"gender" must be one of [male, female, other]') {
-    return res.status(400).json({ error: error.message })
-  }
   if (error.message === 'Cannot use the email provided') {
     return res.status(403).json({ error: error.message })
   }
 
-  if (error.message === 'Passwords do not match') {
-    return res.status(400).json({ error: error.message })
+  if (error.message === 'Problem fetching users') {
+    return res.status(422).json({ error: error.message })
   }
+
+  if (error.message === 'Incorrect login credentials') {
+    return res.status(401).json({ error: error.message })
+  }
+
   next(error)
 }
 const errorMiddleware = {

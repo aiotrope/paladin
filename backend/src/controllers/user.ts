@@ -1,14 +1,19 @@
+import config from '../utils/config'
 import { Request, Response } from 'express'
 require('express-async-errors')
 import { HydratedDocument } from 'mongoose'
 import bcrypt from 'bcrypt'
-import * as z from 'zod'
-import { fromZodError } from 'zod-validation-error'
+import jwt from 'jsonwebtoken'
 
 import { UserModel, User } from '../models/user'
-import { signupSchema } from '../utils/validators'
+import { signupSchema, signinSchema } from '../utils/validators'
 
 //import logger from '../utils/logger'
+
+/**
+ * @desc return an array of users objects with id, email, hashedPassword,
+ * isStaff and timestamps
+ */
 
 const getAll = async (_req: Request, res: Response) => {
   try {
@@ -19,13 +24,15 @@ const getAll = async (_req: Request, res: Response) => {
     return res.status(200).json(users)
   } catch (err) {
     if (err instanceof Error) {
-      throw Error(`${err.message}`)
-    } else if (err instanceof z.ZodError) {
-      const validationError = fromZodError(err)
-      throw Error(validationError.toString())
+      return res.status(422).json({ error: err.message })
     }
   }
 }
+
+/**
+ * @desc create new user with request body of email, password and confirm
+ * @return user object - id, email, hashedPassword, isStaff and timestamps
+ */
 
 const signup = async (req: Request, res: Response) => {
   const foundUser = await UserModel.findOne({ email: req.body.email })
@@ -46,7 +53,9 @@ const signup = async (req: Request, res: Response) => {
         email: req.body.email,
         hashedPassword: hashed,
       })
+
       await user.save()
+
       return res.status(201).json(user)
     }
   } catch (err) {
@@ -56,7 +65,49 @@ const signup = async (req: Request, res: Response) => {
   }
 }
 
+/**
+ * @desc to send auth credentials - email & password
+ * @return access (token) and user's email
+ */
+
+const signin = async (req: Request, res: Response) => {
+  let { email, password } = req.body
+
+  const validData = await signinSchema.validateAsync(req.body, {
+    abortEarly: true,
+  })
+
+  if (validData.error) {
+    return res.status(400).json({ error: validData.error.details.message })
+  }
+
+  try {
+    const user = await UserModel.findOne({ email })
+
+    const correctPassword =
+      user === null
+        ? false
+        : await bcrypt.compare(password, user.hashedPassword)
+
+    if (!(user && correctPassword)) throw Error('Incorrect login credentials')
+
+    const payload = {
+      email: user.email,
+      id: user.id,
+    }
+
+    const token = jwt.sign(payload, config.jwt_secret, { expiresIn: '1h' })
+
+    res.status(200).json({ access: token, email: payload.email })
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(401).json({ error: err.message })
+    }
+  }
+}
+
 export default {
   getAll,
   signup,
+  signin,
 }

@@ -9,9 +9,16 @@ export const signupSchema = Joi.object()
     password: Joi.string()
       .pattern(
         password_regex,
-        'One lower & uppercase letter, 1 number and one symbols are allowed'
+        'Password requires 8 characters with one lower, 1 uppercase letter, 1 number and 1 symbol'
       )
       .required(),
     confirm: Joi.string().valid(Joi.ref('password')).required().strict(),
+  })
+  .required()
+
+export const signinSchema = Joi.object()
+  .keys({
+    email: Joi.string().trim().required().email(),
+    password: Joi.string().trim().required(),
   })
   .required()

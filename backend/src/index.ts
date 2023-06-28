@@ -3,12 +3,18 @@ import express from 'express'
 require('express-async-errors')
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import session from 'express-session'
 import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
+import passport from 'passport'
 
 import dbConnection from './utils/db'
 import loggingMiddleware from './middlewares/loggingMiddleware'
 import errorMiddleware from './middlewares/errorMiddleware'
+import {
+  jwtStrategy,
+  authenticateUserLocal,
+} from './middlewares/passportHandler'
 import logger from './utils/logger'
 
 import userRouter from './routes/user'
@@ -16,6 +22,10 @@ import userRouter from './routes/user'
 const app = express()
 
 dbConnection()
+
+jwtStrategy(passport)
+
+authenticateUserLocal(passport)
 
 app.use(express.static('../frontend/build'))
 
@@ -34,6 +44,18 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use(cors())
+
+app.use(
+  session({
+    secret: config.session_secret,
+    resave: false,
+    saveUninitialized: false,
+  })
+)
+
+app.use(passport.initialize())
+
+app.use(passport.session())
 
 app.use(helmet())
 

@@ -3,7 +3,21 @@ POST http://localhost:8080/api/user/signup
 Content-Type: application/json
 
 {
-   "email": "sample3@sr.io",
-   "password": "passP123//##",
-   "confirm": "passP123//##"
+   "email": "sample1@sr.io",
+   "password": "passworD1#",
+   "confirm": "passworD1#"
 }
+
+### sigin
+POST http://localhost:8080/api/user/signin
+Content-Type: application/json
+
+{
+   "email": "sample1@sr.io",
+   "password": "passworD1#"
+}
+
+### all users
+GET http://localhost:8080/api/user
+Content-Type: application/json
+

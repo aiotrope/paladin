@@ -16,6 +16,9 @@ export class User {
 
   @prop({ required: true })
   public hashedPassword!: string
+
+  @prop({ default: false })
+  public isStaff!: boolean
 }
 
 export const UserModel = getModelForClass(User, {
