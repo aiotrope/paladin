@@ -14,11 +14,17 @@ export class User {
   })
   public email!: string
 
-  @prop({ required: true })
-  public hashedPassword!: string
+  @prop({ default: null })
+  public username?: string
+
+  @prop({ default: null })
+  public hashedPassword?: string
 
   @prop({ default: false })
-  public isStaff!: boolean
+  public isStaff?: boolean
+
+  @prop({ default: null })
+  public googleId?: string
 }
 
 export const UserModel = getModelForClass(User, {

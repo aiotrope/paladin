@@ -4,6 +4,7 @@ require('express-async-errors')
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import session from 'express-session'
+//import cookieSession from 'cookie-session'
 import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
 import passport from 'passport'
@@ -11,10 +12,11 @@ import passport from 'passport'
 import dbConnection from './utils/db'
 import loggingMiddleware from './middlewares/loggingMiddleware'
 import errorMiddleware from './middlewares/errorMiddleware'
-import {
-  jwtStrategy,
-  authenticateUserLocal,
-} from './middlewares/passportHandler'
+
+import { jwtStrategy } from './services/passport/jwt'
+import { localStrategy } from './services/passport/local'
+import { googleStrategy } from './services/passport/google'
+
 import logger from './utils/logger'
 
 import userRouter from './routes/user'
@@ -25,7 +27,9 @@ dbConnection()
 
 jwtStrategy(passport)
 
-authenticateUserLocal(passport)
+googleStrategy(passport)
+
+localStrategy(passport)
 
 app.use(express.static('../frontend/build'))
 
@@ -37,8 +41,9 @@ app.use(cookieParser())
 
 if (process.env.NODE_ENV === 'development') {
   let options = {
-    origin: 'http://127.0.0.1:5173',
+    origin: 'http://127.0.0.1:5173/',
     optionsSuccessStatus: 200,
+    credentials: true,
   }
   app.use(cors(options))
 }
@@ -52,6 +57,13 @@ app.use(
     saveUninitialized: false,
   })
 )
+
+/* app.use(
+  cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [config.cookie_secret1, config.cookie_secret2],
+  })
+) */
 
 app.use(passport.initialize())
 

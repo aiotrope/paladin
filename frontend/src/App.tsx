@@ -1,12 +1,18 @@
 import { useState } from 'react'
 
-import getGoogleOAuthURL from './utils/getGoogleUrl'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+import GoogleButton from 'react-google-button'
+
 function App() {
   const [count, setCount] = useState(0)
+
+  const login = () => {
+    const googleLoginURL = 'http://127.0.0.1:8080/api/user/google/login'
+    window.open(googleLoginURL, '_blank', 'width=500,height=600')
+  }
 
   return (
     <>
@@ -27,8 +33,7 @@ function App() {
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
       <div>
-        <a href={getGoogleOAuthURL()}>Login with Google</a>
-        Please login
+        <GoogleButton onClick={() => login()} />
       </div>
     </>
   )

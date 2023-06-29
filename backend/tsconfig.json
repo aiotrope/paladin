@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "experimentalDecorators": true ,
+    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "commonjs",
     "rootDir": "./src",
@@ -9,6 +9,7 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "types": ["node"],
+    "typeRoots": ["./src/@types", "./node_modules/@types"],
     "sourceMap": true,
     "importHelpers": true,
     "allowSyntheticDefaultImports": true,

@@ -13,9 +13,9 @@ const googleOAuthURL = () => {
     ].join(' '),
   }
 
-  const qs = new URLSearchParams(options)
+  const queryString = new URLSearchParams(options)
 
-  return `${rootUrl}?${qs.toString()}`
+  return `${rootUrl}?${queryString.toString()}`
 }
 
 export default googleOAuthURL

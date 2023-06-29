@@ -11,13 +11,16 @@ import { signupSchema, signinSchema } from '../utils/validators'
 //import logger from '../utils/logger'
 
 /**
- * @desc return an array of users objects with id, email, hashedPassword,
+ * @desc return an array of users objects with id, email, username,
  * isStaff and timestamps
  */
 
 const getAll = async (_req: Request, res: Response) => {
   try {
-    const users: User[] = await UserModel.find({})
+    const users = await UserModel.find({}).select({
+      hashedPassword: 0,
+      googleId: 0,
+    })
 
     if (!users) throw Error('Problem fetching users')
 
@@ -40,17 +43,18 @@ const signup = async (req: Request, res: Response) => {
   if (foundUser) throw Error('Cannot use the email provided')
 
   try {
-    const validData = await signupSchema.validateAsync(req.body)
+    const validData = signupSchema.validate(req.body)
 
     if (validData.error) {
-      return res.status(400).json({ error: validData.error.details.message })
+      return res.status(400).json({ error: validData.error.details[0].message })
     } else {
       const saltRounds = 10
 
       const hashed = await bcrypt.hash(req.body.password, saltRounds)
 
       const user: HydratedDocument<User> = new UserModel({
-        email: req.body.email,
+        email: validData.value.email,
+        username: validData.value.username,
         hashedPassword: hashed,
       })
 
@@ -92,13 +96,15 @@ const signin = async (req: Request, res: Response) => {
     if (!(user && correctPassword)) throw Error('Incorrect login credentials')
 
     const payload = {
-      email: user.email,
       id: user.id,
+      email: user.email,
     }
 
     const token = jwt.sign(payload, config.jwt_secret, { expiresIn: '1h' })
 
-    res.status(200).json({ access: token, email: payload.email })
+    req.user = user
+
+    res.status(200).json({ accessToken: token, email: payload.email })
   } catch (err) {
     if (err instanceof Error) {
       res.status(401).json({ error: err.message })
